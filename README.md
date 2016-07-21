@@ -1,5 +1,5 @@
 # comf
-C++ 14 OpenGL mini framework
+**C**++ 14 **O**penGL **m**ini **f**ramework
 
 ![Screenshot](https://raw.githubusercontent.com/Tchayen/comf/master/screenshot.png)
 
