@@ -1,5 +1,5 @@
-# comf
-**C**++ 14 **O**penGL **m**ini **f**ramework
+# COMF
+**C**++14 **O**penGL **M**ini **F**ramework
 
 ![Screenshot](https://raw.githubusercontent.com/Tchayen/comf/master/screenshot.png)
 
