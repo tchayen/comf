@@ -4,7 +4,7 @@ C++ 14 OpenGL mini framework
 ![Screenshot](https://raw.githubusercontent.com/Tchayen/comf/master/screenshot.png)
 
 #Description
-Small framework hiding and grouping all necessary OpenGL API calls in individual functions and objects. Uses C++ 14 (move semantics, RAII, smart pointers) in order to make it harder to accidentally break things.
+Small framework hiding and grouping all necessary OpenGL API calls into individual functions and objects. Uses C++ 14 (move semantics, RAII, smart pointers) in order to make it harder to accidentally break things.
 
 #Usage
 Using the .sln file you can run the project in Visual Studio 2015 and compile it.
