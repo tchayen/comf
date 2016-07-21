@@ -10,7 +10,7 @@ Small framework hiding and grouping all necessary OpenGL API calls in individual
 Using the .sln file you can run the project in Visual Studio 2015 and compile it.
 
 #License & dependencies
-[GLEW](https://github.com/nigels-com/glew) – [modified BSD](http://glew.sourceforge.net/glew.tx)  
+[GLEW](https://github.com/nigels-com/glew) – [modified BSD](http://glew.sourceforge.net/glew.txt)  
 [GLFW](http://www.glfw.org/) – zlib/libpng  
 [FreeType](https://www.freetype.org/) – GPL v3  
 [tinyobjloader](https://syoyo.github.io/tinyobjloader/) – 2  clause BSD  
