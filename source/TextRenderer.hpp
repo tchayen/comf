@@ -38,7 +38,10 @@ public:
     {
         FT_Face face;
         if (FT_New_Face(ft, path.c_str(), 0, &face))
+        {
             log("Failed to load font.");
+            return;
+        }
 
         FT_Set_Pixel_Sizes(face, 0, fontSize);
 

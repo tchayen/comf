@@ -14,7 +14,7 @@
     <ProjectGuid>{A5740598-9258-4912-B2C6-0491A0E8F11E}</ProjectGuid>
     <RootNamespace>opengl_app</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>opengl_cpp14</ProjectName>
+    <ProjectName>comf</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
