@@ -19,21 +19,24 @@ public:
 
     Mesh(std::string&& file)
     {
+        if (file.length() == 0)
+            error("Filepath is empty.");
+
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
 
         tinyobj::LoadObj(shapes, materials, file.c_str());
 
-        for (unsigned int i = 0; i < shapes[0].mesh.positions.size(); i += 3)
+        for (uint32 i = 0; i < shapes[0].mesh.positions.size(); i += 3)
             vertices.push_back(glm::vec3(shapes[0].mesh.positions[i], shapes[0].mesh.positions[i + 1], shapes[0].mesh.positions[i + 2]));
 
-        for (unsigned int i = 0; i < shapes[0].mesh.texcoords.size(); i += 2)
+        for (uint32 i = 0; i < shapes[0].mesh.texcoords.size(); i += 2)
             uvs.push_back(glm::vec2(shapes[0].mesh.texcoords[i], shapes[0].mesh.texcoords[i + 1]));
 
-        for (unsigned int i = 0; i < shapes[0].mesh.normals.size(); i += 3)
+        for (uint32 i = 0; i < shapes[0].mesh.normals.size(); i += 3)
             normals.push_back(glm::vec3(shapes[0].mesh.normals[i], shapes[0].mesh.normals[i + 1], shapes[0].mesh.normals[i + 2]));
 
-        for (unsigned int i = 0; i < shapes[0].mesh.indices.size(); i++)
+        for (uint32 i = 0; i < shapes[0].mesh.indices.size(); i++)
             indices.push_back(shapes[0].mesh.indices[i]);
 
         // Fatal error - one of the vectors is empty and it will cause problems with OpenGL buffers. Program must be closed.
@@ -62,11 +65,7 @@ public:
                 info.append("normals");
             }
 
-            log("There are no " + info + " in mesh from file \"" + file + "\".");
-            
-            // TODO: Later on when one method of closing program in case of fatal error is known change line below to that.
-            // For now simply throwing will do the job.
-            throw;
+            error("There are no " + info + " in mesh from file \"" + file + "\".");
         }
 
         glGenVertexArrays(1, &vao);
@@ -125,7 +124,7 @@ private:
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec2> uvs;
     std::vector<glm::vec3> normals;
-    std::vector<unsigned short int> indices;
+    std::vector<uint16> indices;
 
     GLuint vao;
 

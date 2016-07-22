@@ -25,7 +25,7 @@
 
 glm::mat4 projection;
 
-int g_deltaY;
+int32 g_deltaY;
 void scrollCallback(GLFWwindow* window, double deltaX, double deltaY);
 
 std::unique_ptr<TextRenderer> text;
@@ -47,16 +47,16 @@ void update();
 struct Window
 {
     double mouseX, mouseY;
-    int width = 1440, height = 810;
+    int32 width = 1440, height = 810;
     GLFWwindow* glfwPointer = nullptr;
 } window;
 
 std::string gpuInfo;
 
 const GLuint SHADOWMAP_SIZE = 1024;
-GLuint quadVAO, quadVBO;
+GLuint quadVAO = 0, quadVBO = 0;
 
-int main()
+int32 main()
 {
     srand(time(0));
 
@@ -65,8 +65,7 @@ int main()
 
     gpuInfo = "GPU: " + std::string((char*)glGetString(GL_RENDERER)) + "\nDriver version: " + std::string((char*)glGetString(GL_VERSION));
 
-    //s = std::make_unique<Shader>("shaders/basic.vert", "shaders/basic.frag");
-    fontShader = std::make_unique<Shader>("shaders/font.vert", "shaders/font.frag");
+    fontShader = std::make_unique<Shader>("", "shaders/font.frag");
 
     simpleDepthShader = std::make_unique<Shader>("shaders/shadow.vert", "shaders/shadow.frag");
     blurShader = std::make_unique<Shader>("shaders/blur.vert", "shaders/blur.frag");
@@ -75,7 +74,7 @@ int main()
     debugQuadShader = std::make_unique<Shader>("shaders/debug_quad.vert", "shaders/debug_quad.frag");
 
     text = std::make_unique<TextRenderer>(
-        std::vector<std::pair<std::string, int>>
+        std::vector<std::pair<std::string, int32>>
         {
             { std::string("assets/roboto_light.ttf"), 22 },
             { std::string("assets/liberation_mono.ttf"), 16 }
@@ -125,7 +124,7 @@ void renderScene(std::shared_ptr<Shader> s)
     plane->draw();
     
     /*
-    for (int i = 0; i < positions.size(); i++)
+    for (int32 i = 0; i < positions.size(); i++)
     {
         s->setUniform(
             "model",
@@ -147,13 +146,14 @@ void renderQuad()
     if (quadVAO == 0)
     {
         GLfloat quadVertices[] = {
-            // Positions        // Texture Coords
-            -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+            // positions        // texture coordinates
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
             -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-            1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-            1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
         };
-        // Setup plane VAO
+
+        // Setup plane VAO.
         glGenVertexArrays(1, &quadVAO);
         glGenBuffers(1, &quadVBO);
         glBindVertexArray(quadVAO);
@@ -176,7 +176,7 @@ void render()
 
     glm::vec3 lightPosition(glm::vec3(-3.0f, 6.0f, -3.0f));
     
-    // get light's projection / view matrix
+    // Light calculations.
     glm::mat4 lightProjection, lightView;
     glm::mat4 lightSpaceMatrix;
     GLfloat near_plane = 1.0f, far_plane = 30.0f;
@@ -185,7 +185,8 @@ void render()
     lightSpaceMatrix = lightProjection * lightView;
     
 #ifdef __VSM__
-    // render scene from light's point of view 
+
+    // Render scene from light's point of view.
     shadowMapFbo->bind();
     glViewport(0, 0, SHADOWMAP_SIZE, SHADOWMAP_SIZE);
     
@@ -205,22 +206,21 @@ void render()
     blurShader->use();
     glViewport(0, 0, SHADOWMAP_SIZE, SHADOWMAP_SIZE);
     
-    // blur shadowMapTexture
+    // Blur shadowMapTexture.
     glDisable(GL_DEPTH_TEST);
     blurShader->use();
-
-    // blur shadowMapTexture (horizontally) to blurTexture
     
-    for (int i = 0; i < 1; i++)
+    for (int32 i = 0; i < 1; i++)
     {
+        // Blur shadowMapTexture (horizontally) to blurTexture.
         blurFbo->bind();
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, shadowMapTexture->getId()); //Input-texture
+        glBindTexture(GL_TEXTURE_2D, shadowMapTexture->getId());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         blurShader->setUniform("horizontal", true);
         renderQuad();
 
-        // blur blurTexture vertically and write to shadowMapTexture
+        // Blur blurTexture vertically and write to shadowMapTexture.
         shadowMapFbo->bind();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, blurTexture->getId());
@@ -234,7 +234,6 @@ void render()
 
 #endif
 
-    // render scene as normal 
     glViewport(0, 0, window.width, window.height);
     glClearColor(0.412f, 0.733f, 0.929f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -269,6 +268,8 @@ void render()
 
     renderScene(shader);
 
+    // Comment beginning and end of the comment block (-> ///* ... //*/) and switch back and forward as you need.
+    // You can customize this debug quad by choosing texture and altering its shader.
     /*
     debugQuadShader->use();
     glUniform1f(glGetUniformLocation(debugQuadShader->getId(), "near_plane"), near_plane);

@@ -27,7 +27,7 @@ public:
 
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (GL_FRAMEBUFFER_COMPLETE != result)
-            log("Framebuffer is not complete.");
+            error("Framebuffer is not complete.");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }

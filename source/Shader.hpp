@@ -29,9 +29,26 @@ public:
         std::string&& vertexShaderFilePath, 
         std::string&& fragmentShaderFilePath)
     {
+        // Check if provided path is not empty.
+        if (vertexShaderFilePath.length() == 0)
+            error("You must provide vertex shader (filename is blank).");
+
+        if (fragmentShaderFilePath.length() == 0)
+            error("You must provide fragment shader (filename is blank).");
+        //
+
         GLuint vertexHandler, fragmentHandler;
         std::string vertexShaderFile = loadFile(std::move(vertexShaderFilePath));
         std::string fragmentShaderFile = loadFile(std::move(fragmentShaderFilePath));
+
+        // Check if file is there.
+        if (vertexShaderFile.length() == 0)
+            error("Vertex shader file is empty or it does not exist.");
+        
+        if (fragmentShaderFile.length() == 0)
+            error("Fragment shader file is empty or it does not exist.");
+        //
+
         const GLchar *vertexShader = vertexShaderFile.c_str();
         const GLchar *fragmentShader = fragmentShaderFile.c_str();
 
@@ -47,7 +64,7 @@ public:
         if (!success)
         {
             glGetProgramInfoLog(id, 512, 0, infoLog);
-            log("Error in linking of shaders:\n" + std::string(infoLog));
+            error("Error in linking of shaders:\n" + std::string(infoLog));
         }
 
         glDeleteShader(vertexHandler);
@@ -57,7 +74,7 @@ public:
     inline void use() const
     {
         if (id == -1)
-            log("Tried to use empty shader.");
+            error("Tried to use empty shader.");
 
         glUseProgram(id);
     }
@@ -76,7 +93,7 @@ public:
         glUniform1i(getUniformLocation(std::move(name)), value);
     }
 
-    inline void setUniform(const std::string &name, int value) const
+    inline void setUniform(const std::string &name, int32 value) const
     {
         glUniform1i(getUniformLocation(std::move(name)), value);
     }
@@ -113,7 +130,7 @@ public:
         glUniform1i(getUniformLocation(std::move(name)), value);
     }
 
-    inline void setUniform(std::string&& name, int value) const
+    inline void setUniform(std::string&& name, int32 value) const
     {
         glUniform1i(getUniformLocation(std::move(name)), value);
     }
@@ -156,7 +173,7 @@ private:
         if (!success)
         {
             glGetShaderInfoLog(shaderHandler, 512, 0, infoLog);
-            log("Error in compilation of shader:\n" + std::string(infoLog));
+            error("Error in compilation of shader:\n" + std::string(infoLog));
         };
 
         return shaderHandler;

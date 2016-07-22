@@ -25,23 +25,20 @@ public:
 
     struct Character
     {
-        GLuint textureId;	// ID handle of the glyph texture
-        glm::ivec2 size;	// Size of glyph
-        glm::ivec2 bearing;	// Offset from baseline to left/top of glyph
-        GLuint advance;		// Horizontal offset to advance to next glyph
+        GLuint textureId;	// ID handle of the glyph texture.
+        glm::ivec2 size;	// Size of glyph.
+        glm::ivec2 bearing;	// Offset from baseline to left/top of glyph.
+        GLuint advance;		// Horizontal offset to advance to next glyph.
     };
 
-    std::uint32_t getFontSize() { return fontSize; }
-    std::uint32_t getLineHeight() { return fontSize; }
+    uint32 getFontSize() { return fontSize; }
+    uint32 getLineHeight() { return fontSize; }
 
-    Font(FT_Library &ft, std::string &path, int fontSize) : fontSize(fontSize)
+    Font(FT_Library &ft, std::string &path, uint32 fontSize) : fontSize(fontSize)
     {
         FT_Face face;
         if (FT_New_Face(ft, path.c_str(), 0, &face))
-        {
-            log("Failed to load font.");
-            return;
-        }
+            error("Failed to load font.");
 
         FT_Set_Pixel_Sizes(face, 0, fontSize);
 
@@ -49,13 +46,14 @@ public:
 
         for (GLubyte c = 0; c < 128; c++)
         {
-            // Load character glyph 
+            // Load character glyph.
             if (FT_Load_Char(face, c, FT_LOAD_RENDER))
             {
-                log("Failed to load glyph.");
+                error("Failed to load glyph.");
                 continue;
             }
-            // Generate texture
+
+            // Generate texture.
             GLuint texture;
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
@@ -70,12 +68,14 @@ public:
                 GL_UNSIGNED_BYTE,
                 face->glyph->bitmap.buffer
                 );
-            // Set texture options
+
+            // Set texture options.
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            // Now store character for later use
+            
+            // Store character for later use.
             Character character =
             {
                 texture,
@@ -86,14 +86,13 @@ public:
             characters.insert(std::pair<GLchar, Character>(c, character));
         }
         glBindTexture(GL_TEXTURE_2D, 0);
-        // Destroy FreeType once we're finished
         FT_Done_Face(face);
     }
 
     std::map<GLchar, Character>& getCharacters() { return characters; }
 private:
-    std::uint32_t fontSize;
-    std::uint32_t lineHeight;
+    uint32 fontSize;
+    uint32 lineHeight;
     std::map<GLchar, Character> characters;
 };
 
@@ -150,16 +149,13 @@ private:
 
     std::shared_ptr<Shader> shader;
 
-    void initializeFreetype(std::vector<std::pair<std::string, int>>&& fontsData)
+    void initializeFreetype(std::vector<std::pair<std::string, int32>>&& fontsData)
     {
         FT_Library ft;
         if (FT_Init_FreeType(&ft))
-            log("Could not initialize FreeType Library.");
+            error("Could not initialize FreeType Library.");
 
-        //for (std::pair<std::string&&, int> info : fontsData)
-        //    fonts.push_back(Font(ft, info.first, info.second));
-
-        for (int i = 0; i < fontsData.size(); i++)
+        for (int32 i = 0; i < fontsData.size(); i++)
             fonts.push_back(Font(ft, fontsData[i].first, fontsData[i].second));
         
         FT_Done_FreeType(ft); 
@@ -176,9 +172,9 @@ private:
 
         glm::vec2 startingPosition = position;
 
-        for (std::uint32_t i = 0; i < text.length(); i++)
+        for (uint32 i = 0; i < text.length(); i++)
         {
-            if (text[i] == 10) // 10 is ASCII code for '\n'
+            if (text[i] == 10) // 10 is ASCII code for '\n'.
             {
                 position.y -= font.getLineHeight();
                 position.x = startingPosition.x;
@@ -193,7 +189,7 @@ private:
             GLfloat w = static_cast<GLfloat>(ch.size.x);
             GLfloat h = static_cast<GLfloat>(ch.size.y);
 
-            // Update VBO for each character
+            // Update VBO for each character.
             GLfloat vertices[6][4] =
             {
                 { xpos, ypos + h, 0.0, 0.0 },
@@ -204,18 +200,22 @@ private:
                 { xpos + w, ypos, 1.0, 1.0 },
                 { xpos + w, ypos + h, 1.0, 0.0 }
             };
-            // Render glyph texture over quad
+
+            // Render glyph texture over quad.
             glBindTexture(GL_TEXTURE_2D, ch.textureId);
-            // Update content of VBO memory
+
+            // Update content of VBO memory.
             glBindBuffer(GL_ARRAY_BUFFER, vbo);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // Be sure to use glBufferSubData and not glBufferData
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
-            // Render quad
             glDrawArrays(GL_TRIANGLES, 0, 6);
-            // Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-            position.x += (ch.advance >> 6); // Bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+
+            // Advance cursors for next glyph (note that advance is number of 1/64 pixels).
+            // Bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels)).
+            position.x += (ch.advance >> 6); 
         }
+
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
     }

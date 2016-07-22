@@ -1,6 +1,8 @@
 #ifndef __GRAPHICS_HPP__
 #define __GRAPHICS_HPP__
 
+#include <stdexcept>
+
 #include <glew-1.9.0\glew.h>
 
 #include "glm-0.9.7.5\glm\glm.hpp"
@@ -14,8 +16,8 @@ public:
 
     void initialize(
         GLFWwindow *&window,
-        int width,
-        int height,
+        int32 width,
+        int32 height,
         void (*scrollCallback)(GLFWwindow* window, double deltaX, double deltaY))
     {
         // GLFW
@@ -29,7 +31,7 @@ public:
 
         if (window == nullptr)
         {
-            log("Failed to create GLFW window.");
+            error("Failed to create GLFW window.");
             glfwTerminate();
         }
 
@@ -43,10 +45,10 @@ public:
         glewExperimental = GL_TRUE;
         if (glewInit() != GLEW_OK)
         {
-            log("Failed to initialize GLEW.");
+            error("Failed to initialize GLEW.");
         }
 
-        int w, h;
+        int32 w, h;
         glfwGetFramebufferSize(window, &w, &h);
 
         glViewport(0, 0, w, h);
@@ -82,7 +84,7 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    inline void useTexture(int shaderId, int textureId, int offset, std::string &&uniformName)
+    inline void useTexture(int32 shaderId, int32 textureId, int32 offset, std::string &&uniformName)
     {
         glActiveTexture(GL_TEXTURE0 + offset);
         glBindTexture(GL_TEXTURE_2D, textureId);
